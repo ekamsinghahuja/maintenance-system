@@ -36,20 +36,25 @@ export async function completeOnboarding(
   const emailAddress = user?.primaryEmailAddress?.emailAddress;
   const role = isAdminEmail(emailAddress) ? "admin" : getRole(existingMetadata);
 
-  await client.users.updateUserMetadata(userId, {
-    publicMetadata: {
-      ...existingMetadata,
+  try {
+    await client.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        ...existingMetadata,
+        flatNumber: normalizedFlatNumber,
+        role,
+      },
+    });
+
+    await upsertResident({
+      clerkUserId: userId,
+      email: emailAddress ?? null,
       flatNumber: normalizedFlatNumber,
       role,
-    },
-  });
+    });
 
-  await upsertResident({
-    clerkUserId: userId,
-    email: emailAddress ?? null,
-    flatNumber: normalizedFlatNumber,
-    role,
-  });
-
-  redirect(role === "admin" ? "/admin" : "/resident");
+    redirect(role === "admin" ? "/admin" : "/resident");
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Failed to save resident information";
+    return { error: errorMessage };
+  }
 }

@@ -57,6 +57,18 @@ export async function upsertResident(input: {
 }) {
   const sql = await getDb();
 
+  // Check if this flat is already assigned to someone else
+  const [existingResident] = (await sql<ResidentRow[]>`
+    SELECT clerk_user_id FROM residents
+    WHERE flat_number = ${input.flatNumber}
+      AND clerk_user_id != ${input.clerkUserId}
+    LIMIT 1
+  `) as ResidentRow[];
+
+  if (existingResident) {
+    throw new Error(`Flat ${input.flatNumber} is already assigned to another resident`);
+  }
+
   await sql`
     INSERT INTO residents (clerk_user_id, email, flat_number, role, created_at, updated_at)
     VALUES (${input.clerkUserId}, ${input.email}, ${input.flatNumber}, ${input.role}, NOW(), NOW())
