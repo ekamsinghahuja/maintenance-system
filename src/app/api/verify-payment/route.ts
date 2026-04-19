@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       account = getAccountById(accountId);
     }
     if (!account && initiative) {
-      account = getAccountForInitiative(initiative);
+      account = await getAccountForInitiative(initiative);
     }
 
     if (!account?.key_secret) {
