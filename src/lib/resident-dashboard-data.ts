@@ -98,16 +98,18 @@ export async function getResidentDashboardData(clerkUserId: string): Promise<Res
 }
 
 export async function getResidentProjectBySlug(slug: string, clerkUserId: string) {
-  const initiative = await findInitiativeBySlug(slug);
+  const [initiative, residentPayments] = await Promise.all([
+    findInitiativeBySlug(slug),
+    listPaymentsForResidentInitiative({
+      clerkUserId,
+      initiativeSlug: slug,
+    }),
+  ]);
 
   if (!initiative) {
     return null;
   }
 
-  const residentPayments = await listPaymentsForResidentInitiative({
-    clerkUserId,
-    initiativeSlug: initiative.slug,
-  });
   const totalPaid = residentPayments.reduce((sum, payment) => sum + payment.amount, 0);
   const expectedByNow = initiative.amount;
 

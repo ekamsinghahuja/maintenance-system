@@ -8,9 +8,11 @@ export default async function Home() {
   const { userId } = await auth();
 
   if (userId) {
-    const user = await currentUser();
+    const [user, resident] = await Promise.all([
+      currentUser(),
+      findResidentByClerkUserId(userId),
+    ]);
     const metadata = (user?.publicMetadata ?? {}) as AppPublicMetadata;
-    const resident = await findResidentByClerkUserId(userId);
     const flatNumber = resident?.flatNumber ?? getFlatNumber(metadata);
     const role = resident?.role ?? getRole(metadata);
 

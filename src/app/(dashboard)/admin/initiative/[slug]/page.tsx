@@ -21,9 +21,11 @@ export default async function AdminInitiativePage({
     redirect("/sign-in");
   }
 
-  const user = await currentUser();
+  const [user, resident] = await Promise.all([
+    currentUser(),
+    findResidentByClerkUserId(userId),
+  ]);
   const metadata = (user?.publicMetadata ?? {}) as AppPublicMetadata;
-  const resident = await findResidentByClerkUserId(userId);
   const role = resident?.role ?? getRole(metadata);
   const flatNumber = resident?.flatNumber ?? getFlatNumber(metadata);
 
