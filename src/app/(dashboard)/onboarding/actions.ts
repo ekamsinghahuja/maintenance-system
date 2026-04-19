@@ -37,19 +37,19 @@ export async function completeOnboarding(
   const role = isAdminEmail(emailAddress) ? "admin" : getRole(existingMetadata);
 
   try {
+    await upsertResident({
+      clerkUserId: userId,
+      email: emailAddress ?? null,
+      flatNumber: normalizedFlatNumber,
+      role,
+    });
+
     await client.users.updateUserMetadata(userId, {
       publicMetadata: {
         ...existingMetadata,
         flatNumber: normalizedFlatNumber,
         role,
       },
-    });
-
-    await upsertResident({
-      clerkUserId: userId,
-      email: emailAddress ?? null,
-      flatNumber: normalizedFlatNumber,
-      role,
     });
 
     redirect(role === "admin" ? "/admin" : "/resident");
