@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { createInitiative } from "@/lib/initiatives";
+import { createInitiative, findInitiativeByName } from "@/lib/initiatives";
 
 export type InitiativeActionState = {
   error?: string;
@@ -25,21 +25,27 @@ export async function createInitiativeAction(
   const dueDay = formData.get("dueDay");
   const frequency = formData.get("frequency");
   const tenorMonths = formData.get("tenorMonths");
+  const allTime = formData.get("allTime");
+  const razorpayAccountId = formData.get("razorpayAccountId");
   const totalTarget = formData.get("totalTarget");
 
   if (
     typeof name !== "string" ||
     typeof amount !== "string" ||
     typeof dueDay !== "string" ||
-    typeof frequency !== "string"
+    typeof frequency !== "string" ||
+    typeof razorpayAccountId !== "string"
   ) {
     return { error: "Initiative form is incomplete. Please try again." };
   }
 
   const numericAmount = Number(amount);
   const numericDueDay = Number(dueDay);
+  const isAllTime = allTime === "true";
   const numericTenorMonths =
-    typeof tenorMonths === "string" && tenorMonths.trim()
+    isAllTime
+      ? null
+      : typeof tenorMonths === "string" && tenorMonths.trim()
       ? Number(tenorMonths)
       : null;
   const numericTotalTarget =
@@ -49,6 +55,15 @@ export async function createInitiativeAction(
 
   if (!name.trim()) {
     return { error: "Initiative name is required." };
+  }
+
+  if (!razorpayAccountId.trim()) {
+    return { error: "Please select a payment account." };
+  }
+
+  const existingInitiative = await findInitiativeByName(name.trim());
+  if (existingInitiative) {
+    return { error: "An initiative with this name already exists. Please choose a different name." };
   }
 
   if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
@@ -76,6 +91,7 @@ export async function createInitiativeAction(
       numericTotalTarget && Number.isFinite(numericTotalTarget)
         ? numericTotalTarget
         : null,
+    razorpayAccountId: razorpayAccountId.trim(),
     createdByClerkUserId: userId,
   });
 

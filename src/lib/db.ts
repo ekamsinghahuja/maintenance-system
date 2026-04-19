@@ -76,10 +76,16 @@ async function initializeDatabase() {
       tenor_months INTEGER,
       total_target NUMERIC(12, 2),
       status TEXT NOT NULL DEFAULT 'active',
+      razorpay_account_id TEXT,
       created_by_clerk_user_id TEXT NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
+  `;
+
+  await sql`
+    ALTER TABLE initiatives
+    ADD COLUMN IF NOT EXISTS razorpay_account_id TEXT
   `;
 
   await sql`

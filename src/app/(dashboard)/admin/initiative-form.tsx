@@ -6,9 +6,14 @@ import {
   type InitiativeActionState,
 } from "./actions";
 
+export type RazorpayAccountOption = {
+  id: string;
+  displayName: string;
+};
+
 const initialState: InitiativeActionState = {};
 
-export function InitiativeForm() {
+export function InitiativeForm({ accounts }: { accounts: RazorpayAccountOption[] }) {
   const [state, formAction, isPending] = useActionState(
     createInitiativeAction,
     initialState,
@@ -22,9 +27,6 @@ export function InitiativeForm() {
       <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[#2f7a5e]">
         Create initiative
       </p>
-      <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#1f2937]">
-        Configure a recurring or fixed-term collection
-      </h2>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <label className="flex flex-col gap-2 text-sm font-medium text-[#4b5563]">
@@ -39,7 +41,7 @@ export function InitiativeForm() {
         </label>
 
         <label className="flex flex-col gap-2 text-sm font-medium text-[#4b5563]">
-          Monthly amount
+          Amount (per flat, per cycle)
           <input
             name="amount"
             type="number"
@@ -71,9 +73,58 @@ export function InitiativeForm() {
             defaultValue="monthly"
             className="h-12 rounded-2xl border border-[#d7e6dc] bg-[#f7fbf8] px-4 text-base text-[#1f2937] outline-none transition focus:border-[#2f7a5e] focus:ring-4 focus:ring-[#d8eee4]"
           >
+            {/* Daily */}
+            <option value="daily">Daily</option>
+            <option value="weekdays">Weekdays (Mon–Fri)</option>
+            <option value="weekends">Weekends</option>
+
+            {/* Weekly */}
+            <option value="weekly">Weekly</option>
+            <option value="bi-weekly">Every 2 weeks</option>
+
+            {/* Monthly */}
             <option value="monthly">Every month</option>
-            <option value="one-time">One-time</option>
+            <option value="bi-monthly">Every 2 months</option>
+
+            {/* Longer intervals */}
+            <option value="quarterly">Quarterly (every 3 months)</option>
+            <option value="half-yearly">Every 6 months</option>
+            <option value="yearly">Yearly</option>
+
+            {/* Custom */}
+            {/* <option value="custom">Custom</option> */}
           </select>
+        </label>
+
+        <label className="flex flex-col gap-2 text-sm font-medium text-[#4b5563]">
+          Payment Account
+          <select
+            name="razorpayAccountId"
+            className="h-12 rounded-2xl border border-[#d7e6dc] bg-[#f7fbf8] px-4 text-base text-[#1f2937] outline-none transition focus:border-[#2f7a5e] focus:ring-4 focus:ring-[#d8eee4]"
+            required
+          >
+            <option value="">Select a payment account</option>
+            {accounts.map((account) => (
+              <option key={account.id} value={account.id}>
+                {account.displayName}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-2 text-sm font-medium text-[#4b5563]">
+          <span className="flex items-center justify-between gap-4">
+            <span>All time initiative</span>
+            <input
+              name="allTime"
+              type="checkbox"
+              value="true"
+              className="h-5 w-5 rounded border border-[#d7e6dc] bg-[#f7fbf8] text-[#2f7a5e] focus:outline-none focus:ring-2 focus:ring-[#2f7a5e]"
+            />
+          </span>
+          <span className="text-xs text-[#6b7280]">
+            When enabled, this initiative continues indefinitely and tenor is not required.
+          </span>
         </label>
 
         <label className="flex flex-col gap-2 text-sm font-medium text-[#4b5563]">
@@ -83,17 +134,6 @@ export function InitiativeForm() {
             type="number"
             min="1"
             placeholder="24"
-            className="h-12 rounded-2xl border border-[#d7e6dc] bg-[#f7fbf8] px-4 text-base text-[#1f2937] outline-none transition focus:border-[#2f7a5e] focus:ring-4 focus:ring-[#d8eee4]"
-          />
-        </label>
-
-        <label className="flex flex-col gap-2 text-sm font-medium text-[#4b5563]">
-          Total target
-          <input
-            name="totalTarget"
-            type="number"
-            min="1"
-            placeholder="72000"
             className="h-12 rounded-2xl border border-[#d7e6dc] bg-[#f7fbf8] px-4 text-base text-[#1f2937] outline-none transition focus:border-[#2f7a5e] focus:ring-4 focus:ring-[#d8eee4]"
           />
         </label>

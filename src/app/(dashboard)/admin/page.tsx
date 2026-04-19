@@ -7,6 +7,7 @@ import { listInitiatives } from "@/lib/initiatives";
 import { listPaymentsForInitiative } from "@/lib/payments";
 import { findResidentByClerkUserId } from "@/lib/residents";
 import { getFlatNumber, getRole, type AppPublicMetadata } from "@/lib/user-metadata";
+import { getAllAccounts } from "@/lib/accounts";
 
 export default async function AdminDashboardPage() {
   const { userId } = await auth();
@@ -41,6 +42,13 @@ export default async function AdminDashboardPage() {
     }),
   );
 
+  // Get all available Razorpay accounts
+  const allAccounts = getAllAccounts();
+  const accountsList = Object.values(allAccounts).map((account) => ({
+    id: account.id,
+    displayName: account.display_name || account.id,
+  }));
+
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,_#eef8f2_0%,_#f8fbf8_42%,_#eef6f2_100%)] px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
@@ -49,39 +57,30 @@ export default async function AdminDashboardPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#2f7a5e]">
               Admin dashboard
             </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#1f2937]">
-              Create initiatives and monitor flat-wise collections
-            </h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6b7280]">
-              Build recurring collections like maintenance or fixed-term drives like
-              construction, then open each initiative to see which flats have paid.
-            </p>
           </div>
           <div className="flex items-center gap-4">
             <div className="rounded-full border border-[#d7e6dc] bg-[#f7fbf8] px-4 py-2 text-sm font-medium text-[#6b7280]">
-              Admin flat {flatNumber}
+              Admin RWA
             </div>
             <UserButton />
           </div>
         </header>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_550px]">
           <section className="rounded-[1.75rem] border border-[#d7e6dc] bg-white p-6 shadow-[0_12px_40px_rgba(40,76,61,0.06)]">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[#2f7a5e]">
                   Current initiatives
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#1f2937]">
-                  Open a card to inspect project collections
-                </h2>
               </div>
               <div className="rounded-full bg-[#f0f8f4] px-4 py-2 text-sm font-medium text-[#2f7a5e]">
                 {initiativeCards.length} active
               </div>
             </div>
 
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 max-h-140 overflow-y-auto">
+              <div className="space-y-4 pr-2">
               {initiativeCards.length === 0 ? (
                 <div className="rounded-[1.5rem] border border-dashed border-[#c7d9ce] bg-[#f7fbf8] p-6 text-sm leading-7 text-[#6b7280]">
                   No initiatives yet. Create one from the panel on the right to start
@@ -147,9 +146,10 @@ export default async function AdminDashboardPage() {
                 </Link>
               ))}
             </div>
+            </div>
           </section>
 
-          <InitiativeForm />
+          <InitiativeForm accounts={accountsList} />
         </div>
       </div>
     </main>

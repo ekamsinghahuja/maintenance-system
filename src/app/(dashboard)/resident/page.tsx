@@ -45,10 +45,6 @@ export default async function ResidentDashboardPage() {
             <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#1f2937]">
               Collections for Flat {flatNumber}
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6b7280]">
-              Track project-wise dues, overpayments, and your recent credits without
-              hunting through messages or spreadsheets.
-            </p>
           </div>
           <div className="flex items-center gap-4">
             <div className="rounded-full border border-[#e8e0cf] bg-[#faf7f1] px-4 py-2 text-sm font-medium text-[#6b7280]">
