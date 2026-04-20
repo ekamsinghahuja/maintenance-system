@@ -77,6 +77,7 @@ async function initializeDatabase() {
       total_target NUMERIC(12, 2),
       status TEXT NOT NULL DEFAULT 'active',
       razorpay_account_id TEXT,
+      start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       created_by_clerk_user_id TEXT NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -86,6 +87,11 @@ async function initializeDatabase() {
   await sql`
     ALTER TABLE initiatives
     ADD COLUMN IF NOT EXISTS razorpay_account_id TEXT
+  `;
+
+  await sql`
+    ALTER TABLE initiatives
+    ADD COLUMN IF NOT EXISTS start_date TIMESTAMPTZ NOT NULL DEFAULT NOW()
   `;
 
   await sql`

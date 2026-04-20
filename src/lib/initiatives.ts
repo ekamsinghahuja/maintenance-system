@@ -12,6 +12,7 @@ export type InitiativeRecord = {
   totalTarget: number | null;
   status: string;
   razorpayAccountId: string | null;
+  startDate: string;
   createdByClerkUserId: string;
   createdAt: string;
   updatedAt: string;
@@ -29,6 +30,7 @@ type InitiativeRow = {
   total_target: string | number | null;
   status: string;
   razorpay_account_id: string | null;
+  start_date: string;
   created_by_clerk_user_id: string;
   created_at: string;
   updated_at: string;
@@ -47,6 +49,7 @@ function mapInitiative(row: InitiativeRow): InitiativeRecord {
     totalTarget: row.total_target == null ? null : Number(row.total_target),
     status: row.status,
     razorpayAccountId: row.razorpay_account_id,
+    startDate: row.start_date,
     createdByClerkUserId: row.created_by_clerk_user_id,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -87,7 +90,7 @@ export async function listInitiatives() {
   const sql = await getDb();
   const rows = (await sql<InitiativeRow[]>`
     SELECT id, slug, name, description, amount, due_day, frequency, tenor_months,
-           total_target, status, razorpay_account_id, created_by_clerk_user_id, created_at, updated_at
+           total_target, status, razorpay_account_id, start_date, created_by_clerk_user_id, created_at, updated_at
     FROM initiatives
     WHERE status = 'active'
     ORDER BY created_at DESC
@@ -100,7 +103,7 @@ export async function findInitiativeBySlug(slug: string) {
   const sql = await getDb();
   const [row] = (await sql<InitiativeRow[]>`
     SELECT id, slug, name, description, amount, due_day, frequency, tenor_months,
-           total_target, status, razorpay_account_id, created_by_clerk_user_id, created_at, updated_at
+           total_target, status, razorpay_account_id, start_date, created_by_clerk_user_id, created_at, updated_at
     FROM initiatives
     WHERE slug = ${slug}
     LIMIT 1
@@ -113,7 +116,7 @@ export async function findInitiativeByName(name: string) {
   const sql = await getDb();
   const [row] = (await sql<InitiativeRow[]>`
     SELECT id, slug, name, description, amount, due_day, frequency, tenor_months,
-           total_target, status, created_by_clerk_user_id, created_at, updated_at
+           total_target, status, razorpay_account_id, start_date, created_by_clerk_user_id, created_at, updated_at
     FROM initiatives
     WHERE name = ${name} AND status = 'active'
     LIMIT 1
@@ -147,6 +150,7 @@ export async function createInitiative(input: {
       total_target,
       status,
       razorpay_account_id,
+      start_date,
       created_by_clerk_user_id,
       created_at,
       updated_at
@@ -162,12 +166,13 @@ export async function createInitiative(input: {
       ${input.totalTarget},
       'active',
       ${input.razorpayAccountId},
+      NOW(),
       ${input.createdByClerkUserId},
       NOW(),
       NOW()
     )
     RETURNING id, slug, name, description, amount, due_day, frequency, tenor_months,
-              total_target, status, razorpay_account_id, created_by_clerk_user_id, created_at, updated_at
+              total_target, status, razorpay_account_id, start_date, created_by_clerk_user_id, created_at, updated_at
   `) as InitiativeRow[];
 
   return mapInitiative(row);

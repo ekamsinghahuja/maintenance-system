@@ -61,6 +61,12 @@ export default async function AdminDashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-4">
+            <Link
+              href="/admin/analytics"
+              className="inline-flex items-center rounded-full border border-[#d7e6dc] bg-[#f7fbf8] px-4 py-2 text-sm font-semibold text-[#2f7a5e] transition hover:bg-white hover:border-[#2f7a5e]"
+            >
+              📊 Analytics
+            </Link>
             <div className="rounded-full border border-[#d7e6dc] bg-[#f7fbf8] px-4 py-2 text-sm font-medium text-[#6b7280]">
               Admin RWA
             </div>
