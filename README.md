@@ -1,6 +1,8 @@
 Maintenance System is a Next.js app for collecting apartment/society fees. Admins create initiatives (Maintenance, Construction, etc.) with configuration (amount, due date, frequency/tenor), residents log in, pick a flat number, and record payments against initiatives.
 
 Status: feature development (MVP flows work; payment gateway integration is optional/ongoing).
+## Architecture Diagram
+<img width="808" height="530" alt="image" src="https://github.com/user-attachments/assets/c9ef4a87-ef28-48b0-8245-13da862ddafa" />
 
 ## Features
 
