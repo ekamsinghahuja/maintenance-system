@@ -1,4 +1,3 @@
-import { getDb } from "@/lib/db";
 import { listInitiatives, findInitiativeBySlug } from "@/lib/initiatives";
 import { listResidentPaymentStatusForInitiative } from "@/lib/payments";
 
