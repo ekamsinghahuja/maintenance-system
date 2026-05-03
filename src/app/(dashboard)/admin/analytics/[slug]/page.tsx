@@ -54,9 +54,6 @@ export default async function InitiativeAnalyticsPage({
     (f) => f.totalPaid > f.expectedAmount,
   ).length;
   const flatsInDebit = flatAnalytics.filter((f) => f.balance > 0).length;
-  const flatsPaid = flatAnalytics.filter(
-    (f) => f.totalPaid >= f.expectedAmount,
-  ).length;
 
   const cellClass = "px-4 py-3";
 

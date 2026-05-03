@@ -1,7 +1,7 @@
 import { listInitiatives } from "@/lib/initiatives";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const initiatives = await listInitiatives();
     return NextResponse.json(
