@@ -27,4 +27,15 @@ export type ResidentCount = {
   withPayments: number;
   withoutPayments: number;
 };
+export type FlatAnalyticsRow = {
+  flatNumber: string;
+  initiativeName: string;
+  initiativeSlug: string;
+  paid: number;
+  expected: number;
+  balance: number;
+  paymentCount: number;
+  lastPaidAt: string | null;
+  email: string | null;
+};
 

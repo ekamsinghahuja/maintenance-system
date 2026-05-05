@@ -3,18 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { UserButton } from '@clerk/nextjs';
-
-type FlatAnalyticsRow = {
-  flatNumber: string;
-  initiativeName: string;
-  initiativeSlug: string;
-  paid: number;
-  expected: number;
-  balance: number;
-  paymentCount: number;
-  lastPaidAt: string | null;
-  email: string | null;
-};
+import { FlatAnalyticsRow } from '@/types/analytics';
+import { download } from "export-to-csv";
+import { exportTransformFromDataArray, generateAndDownloadCsv } from '@/lib/csv';
 
 export default function AnalyticsPage() {
   const [allData, setAllData] = useState<FlatAnalyticsRow[]>([]);
@@ -135,9 +126,35 @@ export default function AnalyticsPage() {
 
         {/* Data Table */}
         <div className="rounded-[1.75rem] border border-[#d7e6dc] bg-white p-6 shadow-[0_12px_40px_rgba(40,76,61,0.06)]">
-          <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[#2f7a5e]">
-            Payment analytics
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[#2f7a5e]">
+              Payment analytics
+            </p>
+            <button
+              onClick={() => {
+                const transformedData = exportTransformFromDataArray(filteredData);
+                generateAndDownloadCsv(transformedData);
+              }}
+              className="rounded-2xl bg-[#2f7a5e] p-2 text-sm font-semibold text-white hover:bg-[#215b47] focus:outline-none focus:ring-2 focus:ring-[#2f7a5e]/20 transition"
+              title="Export CSV"
+              aria-label="Export CSV"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </button>
+          </div>
           {loading ? (
             <div className="mt-6 text-center text-[#6b7280]">Loading...</div>
           ) : filteredData.length === 0 ? (

@@ -1,18 +1,7 @@
 import { listInitiatives } from "@/lib/initiatives";
 import { getFlatWiseAnalytics } from "@/lib/analytics";
 import { NextResponse } from "next/server";
-
-type FlatAnalyticsRow = {
-  flatNumber: string;
-  initiativeName: string;
-  initiativeSlug: string;
-  paid: number;
-  expected: number;
-  balance: number;
-  paymentCount: number;
-  lastPaidAt: string | null;
-  email: string | null;
-};
+import { FlatAnalyticsRow } from '@/types/analytics';
 
 export async function GET() {
   try {
