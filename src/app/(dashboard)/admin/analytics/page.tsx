@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { UserButton } from '@clerk/nextjs';
 import { FlatAnalyticsRow } from '@/types/analytics';
-import { download } from "export-to-csv";
 import { exportTransformFromDataArray, generateAndDownloadCsv } from '@/lib/csv';
 
 export default function AnalyticsPage() {
@@ -135,7 +134,7 @@ export default function AnalyticsPage() {
                 const transformedData = exportTransformFromDataArray(filteredData);
                 generateAndDownloadCsv(transformedData);
               }}
-              className="rounded-2xl bg-[#2f7a5e] p-2 text-sm font-semibold text-white hover:bg-[#215b47] focus:outline-none focus:ring-2 focus:ring-[#2f7a5e]/20 transition"
+              className="rounded-3xl bg-[#2f7a5e] p- text-sm font-semibold text-white hover:bg-[#215b47] focus:outline-none focus:ring-2 focus:ring-[#2f7a5e]/20 transition"
               title="Export CSV"
               aria-label="Export CSV"
             >
@@ -149,7 +148,7 @@ export default function AnalyticsPage() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
