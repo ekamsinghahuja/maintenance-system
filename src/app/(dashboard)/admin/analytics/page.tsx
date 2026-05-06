@@ -7,102 +7,106 @@ import { FlatAnalyticsRow } from '@/types/analytics';
 import { exportTransformFromDataArray, generateAndDownloadCsv } from '@/lib/csv';
 
 export default function AnalyticsPage() {
-  const [allData, setAllData] = useState<FlatAnalyticsRow[]>([]);
-  const [filteredData, setFilteredData] = useState<FlatAnalyticsRow[]>([]);
-  const [loading, setLoading] = useState(true);
   
+  // ######################################################################################### //
+  //                             States for all and filter data.                               //
+  // ######################################################################################### //
+
+  /** allData: Stores the complete analytics data fetched from the server.*/
+  const [allData, setAllData] = useState<FlatAnalyticsRow[]>([]);
+
+  /** filteredData: Stores the analytics data after applying initiative and flat filters.*/
+  const [filteredData, setFilteredData] = useState<FlatAnalyticsRow[]>([]);
+
+
+  // ######################################################################################### //
+  //                                   States for loading.                                     //
+  // ######################################################################################### //
+
+  /** loading: Indicates whether the data is currently being fetched.*/
+  const [loading, setLoading] = useState(true);
+
+
+  // ######################################################################################### //
+  //                                   States for filters.                                     //
+  // ######################################################################################### //
+
+  /** selectedInitiative: Stores the slug of the currently selected initiative for filtering.*/
   const [selectedInitiative, setSelectedInitiative] = useState('*');
+
+  /** selectedFlat: Stores the flat number of the currently selected flat for filtering.*/
   const [selectedFlat, setSelectedFlat] = useState('*');
 
-  // Get unique initiatives and flats for filter options
-  const initiatives = Array.from(
-    new Map(allData.map((row) => [row.initiativeSlug, { slug: row.initiativeSlug, name: row.initiativeName }])).values()
-  ).sort((a, b) => a.name.localeCompare(b.name));
 
-  const flats = Array.from(new Set(allData.map((row) => row.flatNumber))).sort((a, b) =>
-    a.localeCompare(b)
-  );
+  // ######################################################################################### //
+  //                                   filter options.                                         //
+  // ######################################################################################### //
+  const initiatives = getInitiatives(allData);
+  const flats = getFlats(allData);
 
-  // Fetch all data on mount
-  useEffect(() => {
-    const fetchAllData = async () => {
-      try {
-        const res = await fetch('/api/analytics/all');
-        const result = await res.json();
-        setAllData(result);
-        setFilteredData(result);
-      } catch (error) {
-        console.error('Failed to fetch analytics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchAllData();
-  }, []);
+  // ######################################################################################### //
+  //                             Fetching data on component mount.                             //
+  // ######################################################################################### //
+  useEffect(() => {fetchAllData();}, []);
+  useEffect(() => {updateFilteredData();}, [selectedInitiative, selectedFlat, allData]);
 
-  // Apply filters whenever they change
-  useEffect(() => {
+
+  // ######################################################################################### //
+  //                             Helper functions to extract filter options.                   //       
+  // ######################################################################################### //
+
+  /** getInitiatives: Extracts unique initiatives from the analytics data for filter options. */
+  function getInitiatives(allData: any[]) {
+    return Array.from(
+      new Map(
+        allData.map((row) => [
+          row.initiativeSlug,
+          { slug: row.initiativeSlug, name: row.initiativeName },
+        ])
+      ).values()
+    ).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  /** getFlats: Extracts unique flat numbers from the analytics data for filter options. */
+  function getFlats(allData: any[]) {
+    return Array.from(
+      new Set(allData.map((row) => row.flatNumber))
+    ).sort((a, b) => a.localeCompare(b));
+  }
+
+  /** fetchAllData: Fetches all analytics data from the API. */
+  async function fetchAllData() {
+    try {
+      const res = await fetch('/api/analytics/all');
+      const result = await res.json();
+      setAllData(result);
+      setFilteredData(result);
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  } 
+
+  /** updateFilteredData: Updates the filtered data based on the current filter selections. */
+  function updateFilteredData() {
     let filtered = allData;
-
-    if (selectedInitiative !== '*') {
-      filtered = filtered.filter((row) => row.initiativeSlug === selectedInitiative);
-    }
-
-    if (selectedFlat !== '*') {
-      filtered = filtered.filter((row) => row.flatNumber === selectedFlat);
-    }
-
+    if (selectedInitiative !== '*') filtered = filtered.filter((row) => row.initiativeSlug === selectedInitiative);
+    if (selectedFlat !== '*') filtered = filtered.filter((row) => row.flatNumber === selectedFlat);
     setFilteredData(filtered);
-  }, [selectedInitiative, selectedFlat, allData]);
+  }
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,_#eef8f2_0%,_#f8fbf8_42%,_#eef6f2_100%)] px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <header className="flex flex-col gap-4 rounded-[1.75rem] border border-[#d7e6dc] bg-white p-6 shadow-[0_12px_40px_rgba(40,76,61,0.06)] sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Link
-              href="/admin"
-              className="text-sm font-semibold uppercase tracking-[0.24em] text-[#2f7a5e]"
-            >
-              Back to dashboard
-            </Link>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#1f2937]">
-              Analytics
-            </h1>
-            <p className="mt-2 text-sm text-[#6b7280]">
-              Initiative = {selectedInitiative === '*' ? '*' : selectedInitiative} | Flats = {selectedFlat === '*' ? '*' : selectedFlat}
-            </p>
-          </div>
-          <UserButton />
-        </header>
-
+        <AnalyticsPageHeader selectedInitiative={selectedInitiative} selectedFlat={selectedFlat} />
         {/* Filters */}
         <div className="rounded-[1.75rem] border border-[#d7e6dc] bg-white p-6 shadow-[0_12px_40px_rgba(40,76,61,0.06)]">
-          <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[#2f7a5e]">
-            Filter options
-          </p>
+         
+          <FilterHeader />
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {/* Initiative Filter */}
-            <div>
-              <label className="block text-sm font-semibold text-[#2f7a5e]">
-                Initiative Filter
-              </label>
-              <select
-                value={selectedInitiative}
-                onChange={(e) => setSelectedInitiative(e.target.value)}
-                className="mt-2 w-full rounded-2xl border border-[#d7e6dc] bg-white px-4 py-2 text-[#1f2937] focus:border-[#2f7a5e] focus:outline-none focus:ring-2 focus:ring-[#2f7a5e]/20"
-              >
-                <option value="*">* (All Initiatives)</option>
-                {initiatives.map((init) => (
-                  <option key={init.slug} value={init.slug}>
-                    {init.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Flat Filter */}
+            <InitiativeFilter selectedInitiative={selectedInitiative} setSelectedInitiative={setSelectedInitiative} initiatives={initiatives} />
             <div>
               <label className="block text-sm font-semibold text-[#2f7a5e]">
                 Flat Filter
@@ -216,4 +220,70 @@ export default function AnalyticsPage() {
       </div>
     </main>
   );
+
 }
+
+function AnalyticsPageHeader({
+  selectedInitiative, 
+  selectedFlat
+}: {
+  selectedInitiative: string; 
+  selectedFlat: string;
+}) {
+  return (
+    <header className="flex flex-col gap-4 rounded-[1.75rem] border border-[#d7e6dc] bg-white p-6 shadow-[0_12px_40px_rgba(40,76,61,0.06)] sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <Link href="/admin" className="text-sm font-semibold uppercase tracking-[0.24em] text-[#2f7a5e]">
+          Back to dashboard
+        </Link>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#1f2937]">
+          Analytics
+        </h1>
+        <p className="mt-2 text-sm text-[#6b7280]">
+          Initiative = {selectedInitiative === "*" ? "*" : selectedInitiative} |
+          Flats = {selectedFlat === "*" ? "*" : selectedFlat}
+        </p>
+      </div>
+      <UserButton />
+    </header>
+  );
+}
+
+function FilterHeader() {
+  return (
+    <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[#2f7a5e]">
+      Filter options
+    </p>
+  );
+}
+
+function InitiativeFilter({
+  selectedInitiative,
+  setSelectedInitiative,
+  initiatives,
+}: {
+  selectedInitiative: string;
+  setSelectedInitiative: (slug: string) => void;
+  initiatives: { slug: string; name: string }[];
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-semibold text-[#2f7a5e]">
+        Initiative Filter
+      </label>
+      <select
+        value={selectedInitiative}
+        onChange={(e) => setSelectedInitiative(e.target.value)}
+        className="mt-2 w-full rounded-2xl border border-[#d7e6dc] bg-white px-4 py-2 text-[#1f2937] focus:border-[#2f7a5e] focus:outline-none focus:ring-2 focus:ring-[#2f7a5e]/20"
+      >
+        <option value="*">* (All Initiatives)</option>
+        {initiatives.map((init) => (
+          <option key={init.slug} value={init.slug}>
+            {init.name}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
