@@ -97,131 +97,33 @@ export default function AnalyticsPage() {
     setFilteredData(filtered);
   }
 
+  // ######################################################################################### //
+  //                                       UI STUFF                                            //       
+  // ######################################################################################### //
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#eef8f2_0%,_#f8fbf8_42%,_#eef6f2_100%)] px-4 py-6 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#eef8f2_0%,#f8fbf8_42%,#eef6f2_100%)] px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
         <AnalyticsPageHeader selectedInitiative={selectedInitiative} selectedFlat={selectedFlat} />
-        {/* Filters */}
-        <div className="rounded-[1.75rem] border border-[#d7e6dc] bg-white p-6 shadow-[0_12px_40px_rgba(40,76,61,0.06)]">
-         
-          <FilterHeader />
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <InitiativeFilter selectedInitiative={selectedInitiative} setSelectedInitiative={setSelectedInitiative} initiatives={initiatives} />
-            <div>
-              <label className="block text-sm font-semibold text-[#2f7a5e]">
-                Flat Filter
-              </label>
-              <select
-                value={selectedFlat}
-                onChange={(e) => setSelectedFlat(e.target.value)}
-                className="mt-2 w-full rounded-2xl border border-[#d7e6dc] bg-white px-4 py-2 text-[#1f2937] focus:border-[#2f7a5e] focus:outline-none focus:ring-2 focus:ring-[#2f7a5e]/20"
-              >
-                <option value="*">* (All Flats)</option>
-                {flats.map((flat) => (
-                  <option key={flat} value={flat}>
-                    {flat}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Data Table */}
-        <div className="rounded-[1.75rem] border border-[#d7e6dc] bg-white p-6 shadow-[0_12px_40px_rgba(40,76,61,0.06)]">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[#2f7a5e]">
-              Payment analytics
-            </p>
-            <button
-              onClick={() => {
-                const transformedData = exportTransformFromDataArray(filteredData);
-                generateAndDownloadCsv(transformedData);
-              }}
-              className="rounded-3xl bg-[#2f7a5e] p- text-sm font-semibold text-white hover:bg-[#215b47] focus:outline-none focus:ring-2 focus:ring-[#2f7a5e]/20 transition"
-              title="Export CSV"
-              aria-label="Export CSV"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </button>
-          </div>
-          {loading ? (
-            <div className="mt-6 text-center text-[#6b7280]">Loading...</div>
-          ) : filteredData.length === 0 ? (
-            <div className="mt-6 text-center text-[#6b7280]">No data available</div>
-          ) : (
-            <div className="mt-6 overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[#dfebe4] bg-[#fbfdfb]">
-                    <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Flat</th>
-                    <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Initiative</th>
-                    <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Expected</th>
-                    <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Paid</th>
-                    <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Balance</th>
-                    <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Payments</th>
-                    <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Last Paid</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredData.map((row, idx) => (
-                    <tr
-                      key={`${row.flatNumber}-${row.initiativeSlug}-${idx}`}
-                      className="border-b border-[#e7efe9] hover:bg-[#f7fbf8] transition"
-                    >
-                      <td className="px-4 py-4 font-semibold text-[#1f2937]">
-                        {row.flatNumber}
-                      </td>
-                      <td className="px-4 py-4 text-[#6b7280]">
-                        {row.initiativeName}
-                      </td>
-                      <td className="px-4 py-4 text-[#6b7280]">
-                        Rs {row.expected.toLocaleString('en-IN')}
-                      </td>
-                      <td className="px-4 py-4 font-semibold text-[#215b47]">
-                        Rs {row.paid.toLocaleString('en-IN')}
-                      </td>
-                      <td className={`px-4 py-4 font-semibold ${
-                        row.balance > 0 ? 'text-[#b91c1c]' : 'text-[#215b47]'
-                      }`}>
-                        Rs {row.balance.toLocaleString('en-IN')}
-                      </td>
-                      <td className="px-4 py-4 text-[#1f2937]">
-                        {row.paymentCount}
-                      </td>
-                      <td className="px-4 py-4 text-[#6b7280]">
-                        {row.lastPaidAt
-                          ? new Date(row.lastPaidAt).toLocaleDateString('en-IN')
-                          : '-'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="border-t border-[#e7efe9] bg-[#f7fbf8] px-4 py-3 text-sm text-[#6b7280]">
-                Showing {filteredData.length} of {allData.length} records
-              </div>
-            </div>
-          )}
-        </div>
+        <AnalyticsPageFilterBand
+          selectedInitiative={selectedInitiative}
+          setSelectedInitiative={setSelectedInitiative}
+          selectedFlat={selectedFlat}
+          setSelectedFlat={setSelectedFlat}
+          initiatives={initiatives}
+          flats={flats}/>
+        <AnalyticsDataTable
+          loading={loading}
+          filteredData={filteredData}
+          allData={allData}/>
       </div>
     </main>
   );
 
 }
+
+  // ######################################################################################### //
+  //                                       Header                                              //       
+  // ######################################################################################### //
 
 function AnalyticsPageHeader({
   selectedInitiative, 
@@ -247,6 +149,36 @@ function AnalyticsPageHeader({
       <UserButton />
     </header>
   );
+}
+
+
+  // ######################################################################################### //
+  //                                       Filter Band                                         //       
+  // ######################################################################################### //
+function AnalyticsPageFilterBand({
+  selectedInitiative,
+  setSelectedInitiative,
+  selectedFlat,
+  setSelectedFlat,
+  initiatives,
+  flats,
+}: {
+  selectedInitiative: string;
+  setSelectedInitiative: (slug: string) => void;
+  selectedFlat: string;
+  setSelectedFlat: (slug: string) => void;
+  initiatives: { slug: string; name: string }[];
+  flats: string[];
+}) {
+  return (
+    <div className="rounded-[1.75rem] border border-[#d7e6dc] bg-white p-6 shadow-[0_12px_40px_rgba(40,76,61,0.06)]">
+      <FilterHeader />
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <InitiativeFilter selectedInitiative={selectedInitiative} setSelectedInitiative={setSelectedInitiative} initiatives={initiatives} />
+        <FlatFilter selectedFlat={selectedFlat} setSelectedFlat={setSelectedFlat} flats={flats} />
+      </div>
+    </div>
+  )
 }
 
 function FilterHeader() {
@@ -287,3 +219,141 @@ function InitiativeFilter({
   );
 }
 
+
+function FlatFilter({
+  selectedFlat,
+  setSelectedFlat,
+  flats,
+}: {
+  selectedFlat: string;
+  setSelectedFlat: (slug: string) => void;
+  flats: string[];
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-semibold text-[#2f7a5e]">
+        Flat Filter
+      </label>
+      <select
+        value={selectedFlat}
+        onChange={(e) => setSelectedFlat(e.target.value)}
+        className="mt-2 w-full rounded-2xl border border-[#d7e6dc] bg-white px-4 py-2 text-[#1f2937] focus:border-[#2f7a5e] focus:outline-none focus:ring-2 focus:ring-[#2f7a5e]/20"
+      >
+        <option value="*">* (All Flats)</option>
+        {flats.map((flat) => (
+          <option key={flat} value={flat}>
+            {flat}
+          </option>
+        ))}
+      </select>
+    </div>
+
+  );
+}
+
+
+  // ######################################################################################### //
+  //                                       Table                                               //       
+  // ######################################################################################### //
+
+function AnalyticsDataTable({
+  loading,
+  filteredData,
+  allData,
+}: {
+  loading: boolean;
+  filteredData: FlatAnalyticsRow[];
+  allData: FlatAnalyticsRow[];
+}) {
+  return (
+    <div className="rounded-[1.75rem] border border-[#d7e6dc] bg-white p-6 shadow-[0_12px_40px_rgba(40,76,61,0.06)]">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[#2f7a5e]">
+          Payment analytics
+        </p>
+        <button
+          onClick={() => {
+            const transformedData = exportTransformFromDataArray(filteredData);
+            generateAndDownloadCsv(transformedData);
+          }}
+          className="rounded-3xl bg-[#2f7a5e] p-2 text-sm font-semibold text-white hover:bg-[#215b47] focus:outline-none focus:ring-2 focus:ring-[#2f7a5e]/20 transition"
+          title="Export CSV"
+          aria-label="Export CSV"
+        >
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.5}
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+        </button>
+      </div>
+      {loading ? (
+        <div className="mt-6 text-center text-[#6b7280]">Loading...</div>
+      ) : filteredData.length === 0 ? (
+        <div className="mt-6 text-center text-[#6b7280]">No data available</div>
+      ) : (
+        <div className="mt-6 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#dfebe4] bg-[#fbfdfb]">
+                <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Flat</th>
+                <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Initiative</th>
+                <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Expected</th>
+                <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Paid</th>
+                <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Balance</th>
+                <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Payments</th>
+                <th className="px-4 py-3 text-left font-semibold text-[#2f7a5e]">Last Paid</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.map((row, idx) => (
+                <tr
+                  key={`${row.flatNumber}-${row.initiativeSlug}-${idx}`}
+                  className="border-b border-[#e7efe9] hover:bg-[#f7fbf8] transition"
+                >
+                  <td className="px-4 py-4 font-semibold text-[#1f2937]">
+                    {row.flatNumber}
+                  </td>
+                  <td className="px-4 py-4 text-[#6b7280]">
+                    {row.initiativeName}
+                  </td>
+                  <td className="px-4 py-4 text-[#6b7280]">
+                    Rs {row.expected.toLocaleString('en-IN')}
+                  </td>
+                  <td className="px-4 py-4 font-semibold text-[#215b47]">
+                    Rs {row.paid.toLocaleString('en-IN')}
+                  </td>
+                  <td className={`px-4 py-4 font-semibold ${
+                    row.balance > 0 ? 'text-[#b91c1c]' : 'text-[#215b47]'
+                  }`}>
+                    Rs {row.balance.toLocaleString('en-IN')}
+                  </td>
+                  <td className="px-4 py-4 text-[#1f2937]">
+                    {row.paymentCount}
+                  </td>
+                  <td className="px-4 py-4 text-[#6b7280]">
+                    {row.lastPaidAt
+                      ? new Date(row.lastPaidAt).toLocaleDateString('en-IN')
+                      : '-'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="border-t border-[#e7efe9] bg-[#f7fbf8] px-4 py-3 text-sm text-[#6b7280]">
+            Showing {filteredData.length} of {allData.length} records
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
