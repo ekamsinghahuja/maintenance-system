@@ -3,16 +3,19 @@ import { mkConfig, generateCsv, download } from "export-to-csv";
 
 const csvConfig = mkConfig({ useKeysAsHeaders: true });
 
-export function exportTransformFromDataArray(data: FlatAnalyticsRow[]):any {
-    return data.map(row => exportTransformFromDataRow(row));
+type CsvRowValue = string | number;
+type CsvRow = Record<string, CsvRowValue>;
+
+export function exportTransformFromDataArray(data: FlatAnalyticsRow[]): CsvRow[] {
+    return data.map((row) => exportTransformFromDataRow(row));
 }
 
-export function generateAndDownloadCsv(data: any) {
+export function generateAndDownloadCsv(data: CsvRow[]) {
     const csv = generateCsv(csvConfig)(data);
     download(csvConfig)(csv);
 }
 
-function exportTransformFromDataRow(data: FlatAnalyticsRow): any {
+function exportTransformFromDataRow(data: FlatAnalyticsRow): CsvRow {
     return {
         "Flat Number": data.flatNumber,
         "Initiative Name": data.initiativeName,
@@ -24,6 +27,5 @@ function exportTransformFromDataRow(data: FlatAnalyticsRow): any {
         "Email": data.email || 'N/A',
     }
 }
-
 
 

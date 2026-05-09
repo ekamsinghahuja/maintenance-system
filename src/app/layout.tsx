@@ -1,6 +1,10 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import "./globals.css";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "Maintenance Fee Manager",
@@ -16,7 +20,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html
         lang="en"
-        className="h-full antialiased"
+        className={cn("h-full antialiased", "font-sans", geist.variable)}
       >
         <body className="flex min-h-full flex-col bg-slate-50 text-slate-950">
           {children}
