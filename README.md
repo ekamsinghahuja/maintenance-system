@@ -27,78 +27,12 @@ Status: feature development (MVP flows work; payment gateway integration is opti
 - Clerk (`@clerk/nextjs`)
 - Neon Postgres (via `postgres` package)
 - Tailwind CSS v4
-
-## Setup
-
-1) Install deps
-
-```bash
-npm install
 ```
 
-2) Configure environment
 
-Create `.env.local`:
 
-```bash
-cp .env.example .env.local
-```
 
-Fill values in `.env.local`:
 
-```bash
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-DATABASE_URL=postgresql://neondb_owner:...@.../neondb?sslmode=require
-ADMIN_EMAILS=you@domain.com,another@domain.com
-RAZORPAY_ACCOUNTS='{"account1":{"id":"account1","key_id":"...","key_secret":"...","display_name":"Main"}}'
-```
 
-Notes:
-- `ADMIN_EMAILS` controls who is treated as admin.
-- `RAZORPAY_ACCOUNTS` is optional and only needed if you are wiring Razorpay accounts per initiative.
 
-3) Run the dev server
 
-```bash
-npm run dev
-```
-
-Open `http://localhost:3000`.
-
-## How It Works
-
-### Auth + Roles
-
-- Clerk handles sign-in/sign-up routes.
-- On first login, the user completes onboarding and chooses a flat number.
-- If the signed-in user’s email is listed in `ADMIN_EMAILS`, the app routes them to `/admin`.
-
-### Database
-
-The app uses Neon Postgres and creates required tables automatically on demand (no migrations yet):
-
-- `residents`: maps `clerk_user_id` -> `flat_number`, `role`, `email`
-- `initiatives`: admin-created initiative configuration (slug, amount, due day, tenor, target, etc.)
-- `payments`: resident-recorded payments per initiative
-
-Schema bootstrapping currently lives in `src/lib/db.ts`.
-
-## Main Routes
-
-- `/` landing
-- `/resident` resident dashboard (initiative list)
-- `/initiative/[slug]` resident initiative detail + payment form
-- `/admin` admin dashboard + create initiative
-- `/admin/initiative/[slug]` admin initiative detail + flat-wise status
-- `/admin/analytics` admin analytics overview
-- `/admin/analytics/[slug]` initiative analytics
-- `/onboarding` pick flat number
-
-## API Routes
-
-- `/api/initiatives` initiatives API (admin-facing)
-- `/api/create-order` Razorpay order creation
-- `/api/verify-payment` Razorpay payment verification
-- `/api/analytics/all` aggregate analytics
-- `/api/analytics/[slug]` initiative analytics
