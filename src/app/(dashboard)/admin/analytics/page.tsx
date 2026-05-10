@@ -495,7 +495,7 @@ function TableView({
               <TableCell className="text-muted-foreground">{row.initiativeName}</TableCell>
               <TableCell className="text-muted-foreground">Rs {row.expected.toLocaleString('en-IN')}</TableCell>
               <TableCell className="font-semibold text-[#215b47]">Rs {row.paid.toLocaleString('en-IN')}</TableCell>
-              <TableCell className={row.balance > 0 ? 'font-semibold text-[#b91c1c]' : 'font-semibold text-[#215b47]'}>
+              <TableCell className={row.balance <= 0 ? 'font-semibold text-[#b91c1c]' : 'font-semibold text-[#215b47]'}>
                 Rs {row.balance.toLocaleString('en-IN')}
               </TableCell>
               <TableCell>{row.paymentCount}</TableCell>
@@ -523,7 +523,7 @@ function GraphView({
   filteredData: FlatAnalyticsRow[];
 }) {
   const [visibleGraphs, setVisibleGraphs] = useState({
-    overview: false,
+    overview: true,
     initiative: false,
     summary: false,
   });

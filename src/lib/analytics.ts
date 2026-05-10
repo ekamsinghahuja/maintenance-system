@@ -87,7 +87,7 @@ export async function getFlatWiseAnalytics(
       email: item.email,
       totalPaid: Number(item.paidTotal || 0),
       expectedAmount,
-      balance: Math.max(0, expectedAmount - Number(item.paidTotal || 0)),
+      balance: Number(item.paidTotal || 0) - expectedAmount,
       paymentCount: Number(item.paymentCount || 0),
       lastPaidAt: item.lastPaidAt,
     };
