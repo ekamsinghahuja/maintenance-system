@@ -27,7 +27,6 @@ Status: feature development (MVP flows work; payment gateway integration is opti
 - Clerk (`@clerk/nextjs`)
 - Neon Postgres (via `postgres` package)
 - Tailwind CSS v4
-```
 
 
 
